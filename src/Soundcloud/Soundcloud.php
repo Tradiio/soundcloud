@@ -33,30 +33,30 @@ class Soundcloud
         $this->factory = new Factory();
         $this->auth = $this->make('AuthInterface', array($clientID, $clientSecret, $authCallbackUri));
     }
-    
+
     /**
      * Get ClientID for this instance
-     * 
+     *
      * @return string The ClientID set for this instance
      */
     public function getAuthClientID()
     {
         return $this->auth->getClientID();
     }
-    
+
     /**
      * Get the access token.
-     * 
+     *
      * @return mixed the token, else null is returned
      */
     public function getAuthToken()
     {
         return $this->auth->getToken();
     }
-    
+
     /**
      * Get the token scope.
-     * 
+     *
      * @return mixed the scope for this access token, null if empty
      */
     public function getAuthScope()
@@ -66,7 +66,7 @@ class Soundcloud
 
     /**
      * Get the token scope.
-     * 
+     *
      * @return mixed the scope for this access token, null if empty
      */
     public function getExpires()
@@ -76,7 +76,7 @@ class Soundcloud
 
     /**
      * Set the Auth access token.
-     * 
+     *
      * @return void
      */
     public function setAccessToken($accessToken)
@@ -86,7 +86,7 @@ class Soundcloud
 
     /**
      * Set the Auth Scope.
-     * 
+     *
      * @return void
      */
     public function setAuthScope($scope)
@@ -96,28 +96,28 @@ class Soundcloud
 
     /**
      * Set the Auth Expires.
-     * 
+     *
      * @return void
      */
     public function setAuthExpires($expires)
     {
         $this->auth->setExpires($expires);
     }
-    
+
     /**
      * Set the Auth refresh token.
-     * 
+     *
      * @return void
-     */    
+     */
     public function setRefreshToken($refreshToken)
     {
         $this->auth->setRefreshToken($refreshToken);
     }
-        
-    
+
+
     /**
      * Sets up a GET Resource.
-     * 
+     *
      * @param string $path
      * @param array $params
      * @return \Njasm\Soundcloud\Soundcloud
@@ -131,7 +131,7 @@ class Soundcloud
 
     /**
      * Sets up a PUT Resource.
-     * 
+     *
      * @param string $path
      * @param array $params
      * @return \Njasm\Soundcloud\Soundcloud
@@ -142,10 +142,10 @@ class Soundcloud
         $this->resource = $this->make('ResourceInterface', array('put', $path, $params));
         return $this;
     }
-    
+
     /**
      * Sets up a POST Resource.
-     * 
+     *
      * @param string $path
      * @param array $params
      * @return \Njasm\Soundcloud\Soundcloud
@@ -156,10 +156,10 @@ class Soundcloud
         $this->resource = $this->make('ResourceInterface', array('post', $path, $params));
         return $this;
     }
-    
+
     /**
      * Sets up a DELETE Resource.
-     * 
+     *
      * @param string $path
      * @param array $params
      * @return \Njasm\Soundcloud\Soundcloud
@@ -170,7 +170,7 @@ class Soundcloud
         $this->resource = $this->make('ResourceInterface', array('delete', $path, $params));
         return $this;
     }
-    
+
     /**
      * @param string $interface the interface to build
      * @param array $params the interface object dependencies
@@ -180,10 +180,10 @@ class Soundcloud
     {
         return $this->factory->make($interface, $params);
     }
-    
+
     /**
      * Sets resource params.
-     * 
+     *
      * @param array $params
      * @return \Njasm\Soundcloud\Soundcloud
      * @throws RuntimeException
@@ -193,40 +193,44 @@ class Soundcloud
         if (!isset($this->resource)) {
             throw new \RuntimeException("No Resource found. you must call a http verb method before " . __METHOD__);
         }
-        
+
         $this->resource->setParams($params);
-        
+
         return $this;
     }
-    
+
     /**
      * Executes the request against soundcloud api.
-     * 
+     *
      * @param array $params
      * @return \Njasm\Soundcloud\Request\ResponseInterface
      */
-    public function request(array $params = array())
+    public function request(array $params = array(), $useHttp = false)
     {
+        if ($useHttp) {
+            $this->factory->register('UrlBuilderInterface', 'Njasm\\Soundcloud\\UrlBuilder\\UrlBuilder');
+        }
+
         $urlBuilder = $this->make('UrlBuilderInterface', array($this->resource));
         $this->request = $this->make('RequestInterface', array($this->resource, $urlBuilder, $this->factory));
         $this->request->setOptions($params);
         $this->setResponseFormat($this->request);
-        
+
         $this->response = $this->request->exec();
-        
+
         return $this->response;
     }
-    
+
     /**
      * Get Last Curl Response object.
-     * 
+     *
      * @return mixed The Response Object, null if no request was yet made
      */
     public function getCurlResponse()
     {
         return (isset($this->response)) ? $this->response : null;
     }
-    
+
     /**
      * Sets the Accept Header to application/xml.
      *
@@ -240,7 +244,7 @@ class Soundcloud
         $this->asJson();
         return $this;
     }
-    
+
     /**
      * Sets the Accept Header to application/json.
      *
@@ -254,7 +258,7 @@ class Soundcloud
         $this->responseFormat = "json";
         return $this;
     }
-    
+
     /**
      * Set response format for Request.
      *
@@ -269,10 +273,10 @@ class Soundcloud
             $request->asJson();
         }
     }
-    
+
     /**
      * Build array of auth params for the next request.
-     * 
+     *
      * @param array $params
      * @param bool $includeClientSecret
      * @return array
