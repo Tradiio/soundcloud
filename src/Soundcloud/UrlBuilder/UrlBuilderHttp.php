@@ -27,6 +27,6 @@ class UrlBuilderHttp extends UrlBuilder
         $hostname = "soundcloud.com",
         $scheme = "http://"
     ) {
-        parent::__construct($resource, $scheme, $subdomain, $hostname);
+        parent::__construct($resource, $subdomain, $hostname, $scheme);
     }
 }

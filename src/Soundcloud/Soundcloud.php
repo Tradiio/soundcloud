@@ -208,7 +208,7 @@ class Soundcloud
     public function request(array $params = array(), $useHttp = false)
     {
         if ($useHttp) {
-            $this->factory->register('UrlBuilderInterface', 'Njasm\\Soundcloud\\UrlBuilder\\UrlBuilder');
+            $this->factory->register('UrlBuilderInterface', 'Njasm\\Soundcloud\\UrlBuilder\\UrlBuilderHttp');
         }
 
         $urlBuilder = $this->make('UrlBuilderInterface', array($this->resource));
